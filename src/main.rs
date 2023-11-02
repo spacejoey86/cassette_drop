@@ -1,10 +1,12 @@
 extern crate sdl2;
 
+use rand::seq::SliceRandom;
 use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
 use std::cmp::min;
+use rand;
 
 fn main() {
     let sdl_context = sdl2::init().unwrap();
@@ -40,6 +42,9 @@ fn main() {
     let mut cassette: [u8; PLAYING_SIZE.0 as usize] = [0; PLAYING_SIZE.0 as usize];
     cassette[0] = 1;
 
+    let mut rng = rand::thread_rng();
+    let mut shuffler: Vec<usize> = (0..10).collect();
+
     let mut i = 0;
     'running: loop {
         i = (i + 1) % 255;
@@ -74,6 +79,20 @@ fn main() {
                 },
 
                 _ => {}
+            }
+        }
+
+        //Add another block
+        if i%100 == 0 {
+            shuffler.shuffle(&mut rng);
+            for i in 0..(PLAYING_SIZE.0 as usize + 1) {
+                if i == (PLAYING_SIZE.0 as usize) {
+                    break 'running
+                }
+                if cassette[shuffler[i]] == 0 {
+                    cassette[shuffler[i]] = 1;
+                    break;
+                }
             }
         }
 
